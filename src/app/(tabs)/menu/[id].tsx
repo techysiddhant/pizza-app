@@ -1,14 +1,82 @@
+import products from '@assets/data/products';
 import { Stack, useLocalSearchParams } from 'expo-router'
-import { View, Text } from 'react-native'
-
+import { Image, StyleSheet, Pressable } from 'react-native'
+import { Text, View } from '@components/Themed'
+import Colors from '@constants/Colors';
+import { defaultPizzaImage } from '@components/ProductListItem';
+import { useState } from 'react';
+import Button from '@components/Button';
+const sizes = ['S', 'M', 'L', 'XL']
 const ProductDetailsScreen = () => {
+ const [selectedSize, setSelectedSize] = useState('M');
  const { id } = useLocalSearchParams();
+ const product = products.find(product => product.id.toString() === id);
+
+ const addToCart = () => {
+  // TODO: Add to cart
+ }
+
+ if (!product) {
+  return <Text>Product not found</Text>
+ }
  return (
-  <View>
-   <Stack.Screen options={{ title: 'Product Details ' + id }} />
-   <Text>ProductDetails ID: {id}</Text>
+  <View style={styles.container}>
+   <Stack.Screen options={{ title: product?.name }} />
+   <Image source={{ uri: product.image || defaultPizzaImage }} style={styles.image} />
+   <Text style={styles.selectSize}>Select size</Text>
+   <View style={styles.sizes}>
+    {
+     sizes.map((size) => (
+      <Pressable onPress={() => { setSelectedSize(size) }} key={size} style={[styles.size, { backgroundColor: selectedSize === size ? Colors.light.tint : Colors.light.background }]}>
+       <Text style={[styles.sizeText, { color: selectedSize === size ? Colors.light.background : Colors.light.text }]}>{size}</Text>
+      </Pressable>
+     ))
+    }
+   </View>
+   <Text style={styles.price}>${product.price}</Text>
+   <Button onPress={addToCart} text="Add to cart" />
   </View>
  )
 }
 
 export default ProductDetailsScreen
+const styles = StyleSheet.create({
+ container: {
+  backgroundColor: Colors.light.background,
+  flex: 1,
+  padding: 10
+ },
+ image: {
+  width: '100%',
+  aspectRatio: 1,
+ },
+ price: {
+  fontSize: 18,
+  color: Colors.light.text,
+  fontWeight: 'bold',
+  marginTop: 'auto'
+ },
+ selectSize: {
+  color: Colors.light.text,
+ },
+ sizes: {
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  marginVertical: 10,
+  backgroundColor: Colors.light.background,
+ },
+ size: {
+  backgroundColor: Colors.light.background,
+  color: Colors.light.text,
+  width: 50,
+  aspectRatio: 1,
+  borderRadius: 25,
+  alignItems: 'center',
+  justifyContent: 'center'
+ },
+ sizeText: {
+  fontSize: 20,
+  fontWeight: '500',
+  color: Colors.light.text,
+ },
+})
