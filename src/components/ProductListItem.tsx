@@ -2,22 +2,50 @@ import { StyleSheet, Image, Pressable } from 'react-native';
 import { Text } from '@components/Themed';
 import Colors from '@constants/Colors';
 import { Product } from '../types';
-import { Link } from 'expo-router';
+import { Link, useSegments } from 'expo-router';
 export const defaultPizzaImage = 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png'
 type ProductListItemProps = {
  product: Product;
 }
+// import { StyleSheet, Image, Pressable } from "react-native";
+// import { Text } from "@components/Themed";
+// import Colors from "@constants/Colors";
+// import { Product } from "../types";
+// import { Link, useSegments } from "expo-router";
+
+// export const defaultPizzaImage =
+// 	"https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png";
+
+// type ProductListItemProps = {
+// 	product: Product;
+// };
+
 const ProductListItem = ({ product }: ProductListItemProps) => {
+ const segments = useSegments();
+
+ // Fix type error by checking if segments[0] is defined before using it
+ let menuLink = `/menu/${product.id}`;
+ if (segments[0]) {
+  menuLink = `/${segments[0]}/menu/${product.id}`;
+ }
+
  return (
-  <Link href={`/menu/${product.id}`} asChild>
+  <Link
+   href={menuLink as any}
+   asChild
+  >
    <Pressable style={styles.container}>
-    <Image source={{ uri: product.image || defaultPizzaImage }} style={styles.image} resizeMode='contain' />
+    <Image
+     source={{ uri: product.image || defaultPizzaImage }}
+     style={styles.image}
+     resizeMode="contain"
+    />
     <Text style={styles.title}>{product.name}</Text>
     <Text style={styles.price}>${product.price}</Text>
    </Pressable>
   </Link>
- )
-}
+ );
+};
 
 export default ProductListItem;
 const styles = StyleSheet.create({
