@@ -11,7 +11,7 @@ const CreateProductScreen = () => {
  const [name, setName] = useState('');
  const [price, setPrice] = useState('')
  const [error, setError] = useState('');
- const [image, setImage] = useState('');
+ const [image, setImage] = useState<string | null>('');
  const router = useRouter();
  const { id: idString } = useLocalSearchParams();
  const id = parseInt(typeof idString === 'string' ? idString : idString?.[0]);

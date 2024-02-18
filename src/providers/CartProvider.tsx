@@ -1,21 +1,31 @@
 import { createContext, useContext, useState } from 'react'
-import { CartItem, Product } from 'src/types';
+import { CartItem, Tables } from 'src/types';
 import { randomUUID } from 'expo-crypto';
+import { useInsertOrder } from 'src/api/orders';
+import { useRouter } from 'expo-router';
+import { useInsertOrderItems } from 'src/api/order-items';
+type Product = Tables<'products'>
 type CartType = {
  items: CartItem[];
  addItem: (product: Product, size: CartItem['size']) => void;
  updateQuantity: (itemId: string, amount: -1 | 1) => void;
  total: number;
+ checkout: () => void;
 }
 export const CartContext = createContext<CartType>({
  items: [],
  addItem: () => { },
  updateQuantity: () => { },
  total: 0,
+ checkout: () => { }
 });
 
 const CartProvider = ({ children }: { children: React.ReactNode }) => {
  const [items, setItems] = useState<CartItem[]>([]);
+ const router = useRouter();
+ const { mutate: insertOrder } = useInsertOrder();
+ const { mutate: insertOrderItems } = useInsertOrderItems();
+
  const addItem = (product: Product, size: CartItem["size"]) => {
   const existingItem = items.find((item) => item.product_id === product.id && item.size === size);
   if (existingItem) {
@@ -38,13 +48,40 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
   ).filter((item) => item.quantity > 0));
  };
  const total = items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+ const clearCart = () => {
+  setItems([]);
+ }
+ const checkout = () => {
+  insertOrder({ total }, {
+   onSuccess: saveOrderItems
+  });
+ }
+ const saveOrderItems = (order: any) => {
+  const orderItems = items.map((cartItem) => ({
+   order_id: order.id,
+   product_id: cartItem.product.id,
+   quantity: cartItem.quantity,
+   size: cartItem.size
+  }));
+  insertOrderItems(
+   orderItems
+   ,
+   {
+    onSuccess() {
+     clearCart();
+     router.push(`/(user)/orders/${order.id}`)
+    }
+   });
+
+ }
  return (
   <CartContext.Provider
    value={{
     items,
     addItem,
     updateQuantity,
-    total
+    total,
+    checkout
    }}
   >
    {children}
