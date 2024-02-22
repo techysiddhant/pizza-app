@@ -64,8 +64,8 @@ const ProductDetailsScreen = () => {
 				style={styles.image}
 			/>
 
-			<Text style={styles.title}>${product?.name}</Text>
-			<Text style={styles.price}>${product?.price}</Text>
+			<Text style={styles.title}>{product?.name}</Text>
+			<Text style={styles.price}>&#8377;{product?.price}</Text>
 		</View>
 	);
 };
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 		// marginTop: 'auto'
 	},
 	title: {
-		fontSize: 20,
+		fontSize: 24,
 		color: Colors.light.text,
 	},
 });

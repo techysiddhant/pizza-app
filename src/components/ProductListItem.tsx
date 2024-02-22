@@ -36,7 +36,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
 					fallback={defaultPizzaImage}
 				/>
 				<Text style={styles.title}>{product.name}</Text>
-				<Text style={styles.price}>${product.price}</Text>
+				<Text style={styles.price}>&#8377;{product.price}</Text>
 			</Pressable>
 		</Link>
 	);
